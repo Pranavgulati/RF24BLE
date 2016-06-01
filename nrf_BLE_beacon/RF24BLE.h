@@ -8,8 +8,7 @@
 #ifndef __RF24BLE_H__
 #define __RF24BLE_H__
 #include "RF24.h"
-
-#define MAX_DATA_SIZE 7
+#define DEBUG 0
 class RF24BLE{
 private:
 	uint8_t _packet[32]; //maximum size of payload handled by nrf24L01

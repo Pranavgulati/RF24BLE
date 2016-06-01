@@ -67,8 +67,8 @@ void RF24BLE::begin(){
 	_radio.disableRX();
 	_radio.setAddressLength(4);
 	_radio.setRetries(0, 0);
-	_radio.setDataRate(RF24_1MBPS);//already done by begin
-	_radio.setPALevel(RF24_PA_MAX);//already done by begin
+	_radio.setDataRate(RF24_1MBPS);
+	_radio.setPALevel(RF24_PA_MAX);
 	// Set access addresses (TX address in nRF24L01) to BLE advertising 0x8E89BED6
 	// Both bit and byte orders are reversed for BLE packet format
 	unsigned long address;
@@ -96,22 +96,34 @@ void RF24BLE::setMAC(uint8_t m0, uint8_t m1, uint8_t m2, uint8_t m3, uint8_t m4,
 	_packet[_L++] = m4;
 	_packet[_L++] = m5;
 	//L should be 8 by now
-	_packet[_L++] = 2;		//flags (LE-only, limited discovery mode)
-	_packet[_L++] = 0x01;
-	_packet[_L++] = 0x05;
+	//flags (LE-only, limited discovery mode)
+	_packet[_L++] = 2;		//flag length
+	_packet[_L++] = 0x01; //data type 
+	_packet[_L++] = 0x05; //actual flag
 }
 
 void RF24BLE::setName(char* name){
+	
 	//8,9,10 bytes are for flags 
 	//name field starts from 11th byte
-	//Serial.print(name);
-	//Serial.println(strlen(name));
-	_packet[_L++] = strlen(name) + 1;
-	_packet[_L++] = 0x08;//name type 
-	for (uint8_t i = 0; i < strlen(name); i++){
-		_packet[_L++] = name[i];
+#if DEBUG
+		Serial.print(name);
+	Serial.print(" ");
+	Serial.println(strlen(name));
+#endif
+	if (strlen(name) != 0){
+		//length of name includeing the terminating null character
+		_packet[_L++] = strlen(name) + 1;
+		_packet[_L++] = 0x08;//name type short name 
+		for (uint8_t i = 0; i < strlen(name); i++){
+			_packet[_L++] = name[i];
+		}
 	}
-
+	//else 
+		//no name to be sent 
+		//directly send manufacturere specific data 0xFF
+		//do nothing here
+	
 }
 
 void RF24BLE::setData(const void* data,uint8_t dataLen){
@@ -119,23 +131,31 @@ void RF24BLE::setData(const void* data,uint8_t dataLen){
 	const uint8_t* current = reinterpret_cast<const uint8_t*>(data);
 	//8,9,10 bytes are for flags 
 	//name field starts from 11th byte
+#if DEBUG
 	Serial.print("data "); Serial.println(dataLen);
-	_packet[_L++] = dataLen + 1;
+#endif
+	_packet[_L++] = dataLen ;
 	_packet[_L++] = 0xFF;//data type 
 	for (uint8_t i = 0; i < dataLen; i++){
+		//Serial.print(*current);
 		_packet[_L++] = *(current++);
+		
 	}
-	//after setting data only CRC is left append that to the data
-	_packet[_L++] = 0x55;	//CRC starting val 0x555555
+	//CRC is appended to the data
+	//CRC starting val 0x555555 acc. to spec
+	_packet[_L++] = 0x55;	
 	_packet[_L++] = 0x55;
 	_packet[_L++] = 0x55;
 }
 
 void RF24BLE::sendADV(uint8_t channel){
 	//Serial.print("length "); Serial.println(L);
+	if (_L > 32){ Serial.print("ADV FAIL! Packet too Long"); return; }
 	_radio.setChannel(chRf[channel]);
-	_packet[1] = _L-5;//subtract checksum bytes and the 2 bytes including the length byte itself
+	_packet[1] = _L-5;//subtract checksum bytes and the 2 bytes including the length byte and the first byte
 	blePacketEncode(_packet, _L, chLe[channel]);
 	_radio.startWrite(_packet, _L);
-
+#if DEBUG
+	Serial.print("final length "); Serial.println(_L);
+#endif
 }
