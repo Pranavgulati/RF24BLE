@@ -60,7 +60,6 @@ void RF24BLE::blePacketEncode(uint8_t* packet, uint8_t len, uint8_t chan){
 
 }
 void RF24BLE::begin(){
-
 	_radio.disableCRC();
 	_radio.powerUp();
 	_radio.setAutoAck(false);

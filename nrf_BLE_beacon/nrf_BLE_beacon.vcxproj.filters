@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="nrf_BLE_beacon.ino" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="__vm\.nrf_BLE_beacon.vsarduino.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -32,5 +29,8 @@
     <ClCompile Include="RF24BLE.cpp">
       <Filter>Resource Files</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="nrf_BLE_beacon.ino" />
   </ItemGroup>
 </Project>
