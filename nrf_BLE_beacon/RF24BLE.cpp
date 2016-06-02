@@ -106,7 +106,7 @@ void RF24BLE::setName(char* name){
 	//8,9,10 bytes are for flags 
 	//name field starts from 11th byte
 #if DEBUG
-		Serial.print(name);
+	Serial.print(name);
 	Serial.print(" ");
 	Serial.println(strlen(name));
 #endif
@@ -133,11 +133,12 @@ void RF24BLE::setData(const void* data,uint8_t dataLen){
 #if DEBUG
 	Serial.print("data "); Serial.println(dataLen);
 #endif
-	_packet[_L++] = dataLen ;
+	_packet[_L++] = dataLen +1;
 	_packet[_L++] = 0xFF;//data type 
 	for (uint8_t i = 0; i < dataLen; i++){
 		//Serial.print(*current);
-		_packet[_L++] = *(current++);
+		_packet[_L++] = *(current);
+		current++;
 		
 	}
 	//CRC is appended to the data
