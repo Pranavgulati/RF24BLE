@@ -46,6 +46,7 @@ public:
 	void setName(char* name);
 	void setData(const void* data,uint8_t dataLen);
 	void sendADV(uint8_t channel);
+	void printPacket();
 };
 
 #endif

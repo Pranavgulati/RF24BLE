@@ -1,0 +1,4 @@
+https://www.bluetooth.org/en-us/specification/assigned-numbers/generic-access-profile
+
+http://www.argenox.com/bluetooth-low-energy-ble-v4-0-development/library/a-ble-advertising-primer/
+https://en.wikipedia.org/wiki/Linear-feedback_shift_register

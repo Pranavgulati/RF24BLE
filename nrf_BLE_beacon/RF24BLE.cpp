@@ -159,3 +159,11 @@ void RF24BLE::sendADV(uint8_t channel){
 	Serial.print("final length "); Serial.println(_L);
 #endif
 }
+
+void RF24BLE::printPacket(){
+	for (uint8_t i = 0; i < _L; i++){
+		Serial.print((char)_packet[i]);
+	}
+	Serial.println();
+
+}
