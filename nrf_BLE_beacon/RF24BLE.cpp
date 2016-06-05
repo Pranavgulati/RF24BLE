@@ -13,7 +13,8 @@ RF24BLE::RF24BLE(RF24& radio) : _radio(radio){
 	chLe[2] = 39;
 }
 void RF24BLE::BLEcrc(const uint8_t* data, uint8_t len, uint8_t* output){
-	// implementing CRC with LFSR
+								//packet ,data length ,CRC output
+	// calculating the CRC based on a LFSR
 	uint8_t i, temp, d;
 
 	while (len--){
@@ -33,6 +34,22 @@ void RF24BLE::BLEcrc(const uint8_t* data, uint8_t len, uint8_t* output){
 		}
 	}
 }
+
+uint8_t RF24BLE::checkCRC(uint8_t *input,uint8_t length){
+	uint8_t CRC[3] ={0x55,0x55,0x55 }; //initial value for bluetooth crc
+	uint8_t dataLen = length - 3;
+	BLEcrc(input, dataLen, CRC);
+	if (CRC[0] == *(input + dataLen++) && CRC[1] == *(input + dataLen++) && CRC[2] == *(input + dataLen)){
+		//PACKET IS VALID
+		//Serial.println("VALID");
+		return 1;
+	}
+	else {
+		//PACKET is invalid
+		//Serial.println("CORRUPT");
+		return 0; }
+}
+
 void RF24BLE::bleWhiten(uint8_t* data, uint8_t len, uint8_t whitenCoeff){
 	// Implementing whitening with LFSR
 	uint8_t  m;
@@ -57,7 +74,6 @@ void RF24BLE::blePacketEncode(uint8_t* packet, uint8_t len, uint8_t chan){
 	bleWhiten(packet, len, bleWhitenStart(chan));
 	for (i = 0; i < len; i++)
 		packet[i] = reverseBits(packet[i]); // the byte order of the packet should be reversed as well
-
 }
 void RF24BLE::begin(){
 	_radio.disableCRC();
@@ -166,4 +182,15 @@ void RF24BLE::printPacket(){
 	}
 	Serial.println();
 
+}
+uint8_t RF24BLE::recvPacket(uint8_t *input, uint8_t length,uint8_t channel ){
+	// Packet length includes crc of 3 bytes
+	uint8_t i, dataLen = length - 3;
+	//reversing the bits of the complete packet
+	for (i = 0; i < length; i++){ input[i] = reverseBits(input[i]); }
+	//de-whiten the packet using the same polynomial
+	bleWhiten(input, length, bleWhitenStart(channel));
+	//reversing bits of the crc 
+	for (i = 0; i < 3; i++, dataLen++){ input[dataLen] = reverseBits(input[dataLen]); }
+	return checkCRC(input, length);	
 }

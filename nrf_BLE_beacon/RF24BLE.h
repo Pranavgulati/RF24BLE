@@ -8,7 +8,7 @@
 #ifndef __RF24BLE_H__
 #define __RF24BLE_H__
 #include "RF24.h"
-#define DEBUG 1
+#define DEBUG 0
 class RF24BLE{
 private:
 	uint8_t _packet[32]; //maximum size of payload handled by nrf24L01
@@ -38,6 +38,7 @@ protected:
 	void  blePacketEncode(uint8_t* packet, uint8_t len, uint8_t chan);
 	void  bleWhiten(uint8_t* data, uint8_t len, uint8_t whitenCoeff);
 	void  BLEcrc(const uint8_t* data, uint8_t len, uint8_t* output);
+	uint8_t checkCRC(uint8_t *input,uint8_t length);
 public:
 	RF24BLE(RF24& radio);
 	void begin();
@@ -47,6 +48,7 @@ public:
 	void setData(const void* data,uint8_t dataLen);
 	void sendADV(uint8_t channel);
 	void printPacket();
+	uint8_t recvPacket(uint8_t *input, uint8_t length, uint8_t channel);
 };
 
 #endif
