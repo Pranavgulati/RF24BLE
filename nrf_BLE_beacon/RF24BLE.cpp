@@ -97,6 +97,15 @@ void RF24BLE::begin(){
 	_radio.openWritingPipe(address, 4);
 
 }
+void RF24BLE::recvBegin(uint8_t payloadSize, uint8_t channel, unsigned long pipeAddress){
+	begin();
+	_radio.setChannel(channel);
+	_radio.setPayloadSize(payloadSize);
+	_radio.openReadingPipe(1, 0xe76b7d9171);
+	_radio.startListening();
+
+}
+
 void RF24BLE::setPhone(uint8_t phone_type){
 	//byte no.0 PDu
 	_packet[0] = phone_type;
@@ -183,9 +192,22 @@ void RF24BLE::printPacket(){
 	Serial.println();
 
 }
+uint8_t RF24BLE::getPacketLengthCurr(){ 
+	return _L; }
 uint8_t RF24BLE::recvPacket(uint8_t *input, uint8_t length,uint8_t channel ){
-	// Packet length includes crc of 3 bytes
+	unsigned long time = millis();
+	while (_radio.available()<=0 && (millis()-time)<RECV_TIMEOUT){delay(1);}
+	if (_radio.available()>0){
+		_radio.read(input, length);
+	}
+	else { return 255; }
 	uint8_t i, dataLen = length - 3;
+#if DEBUG
+	for (i = 0; i < length; i++){
+		Serial.print((char)input[i]);
+	}Serial.println();
+	// Packet length includes crc of 3 bytes
+#endif
 	//reversing the bits of the complete packet
 	for (i = 0; i < length; i++){ input[i] = reverseBits(input[i]); }
 	//de-whiten the packet using the same polynomial
