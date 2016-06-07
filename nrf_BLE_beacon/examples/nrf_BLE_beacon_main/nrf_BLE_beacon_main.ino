@@ -61,5 +61,5 @@ void loop() {
 		BLE.setData(&dataBytes, sizeof(dataBytes));
 		BLE.sendADV(channel);
 		}
-	delay(500);    // Broadcasting interval
+	delay(1);    // Broadcasting interval
 }

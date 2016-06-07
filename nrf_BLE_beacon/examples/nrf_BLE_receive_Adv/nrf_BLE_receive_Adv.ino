@@ -1,9 +1,11 @@
 /*
 code for receiving valid BLE advertisement packets 
+!!!!!!PLEASE change the RECV_PAYLOAD_SIZE parameter based on the packet that
+that you want to receive other wise the CRC check will return corrupt !!!!!!
 */
+#include "SPI.h"
 #include <nRF24L01.h>
 #include <RF24.h>
-#include <RF24_config.h>
 #include <RF24BLE.h>
 #include "printf.h"
 
@@ -19,15 +21,13 @@ code for receiving valid BLE advertisement packets
 #define MY_MAC_4  'A'
 #define MY_MAC_5  'B'
 //EXPECTED receive packet length must be same as that of the length of the sent packet
-#define RECV_PAYLOAD_SIZE 29
-
-//do not change default channels for BLE
-uint8_t chRF[3]={0x02,0x1A,0x50};
-uint8_t chBLE[3]={37,38,39};
+#define RECV_PAYLOAD_SIZE 28
 
 RF24 radio(PIN_CE, PIN_CS);
 RF24BLE BLE(radio);
-
+//there are 3 channels at which BLE broadcasts occur
+//hence channel can be 0,1,2 
+byte channel =0; //using single channel to receive
 
 void setup() {
   Serial.begin(115200);
@@ -35,7 +35,7 @@ void setup() {
   radio.begin();
   printf_begin();
   //initialize the radio for receiving BLE advertisements
-  BLE.recvBegin(RECV_PAYLOAD_SIZE,chRF[0]);
+  BLE.recvBegin(RECV_PAYLOAD_SIZE,channel);
 }
 
 void loop() {
@@ -43,7 +43,7 @@ void loop() {
     //receive shall be done when called
     //single channel receiving only 
     //since every channel will have the same information hence choose the optimum channel as per your envt.
-    byte status=BLE.recvPacket((uint8_t*)input,RECV_PAYLOAD_SIZE,chBLE[0]);
+    byte status=BLE.recvPacket((uint8_t*)input,RECV_PAYLOAD_SIZE,channel);
     if(status==RF24BLE_VALID){Serial.println("VALID");}//RF24BLE_VALID=1
     else if(status==RF24BLE_CORRUPT){ Serial.println("CORRUPT");}//RF24BLE_CORRUPT =0
     else if(status==RF24BLE_TIMEOUT){ Serial.println("TIMEOUT");}//RF24BLE_TIMEOUT =-1
@@ -53,7 +53,7 @@ void loop() {
   }Serial.println();
   radio.printDetails();
 #endif
-//delay(1);//breathing time
+delay(10);//breathing time
 }
  
   

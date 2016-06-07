@@ -36,8 +36,9 @@ void loop() {
     uint8_t dataBytes[] = { "hello" };
     BLE.setData(dataBytes, sizeof(dataBytes));
     BLE.sendADV(channel);
+    Serial.print("sent bytes: ");Serial.println(BLE.getPacketLengthCurr());
     delay(1);    // Broadcasting interval
   }
-  delay(500);
+  delay(1);
 }
 
