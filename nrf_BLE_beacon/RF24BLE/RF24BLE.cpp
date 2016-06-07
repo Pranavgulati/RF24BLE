@@ -79,8 +79,8 @@ void RF24BLE::begin(){
 	_radio.disableCRC();
 	_radio.powerUp();
 	_radio.setAutoAck(false);
-	_radio.disableRX();
-	_radio.setAddressLength(4);
+	_radio.stopListening();
+	_radio.setAddressWidth(4);
 	_radio.setRetries(0, 0);
 	_radio.setDataRate(RF24_1MBPS);
 	_radio.setPALevel(RF24_PA_MAX);
@@ -94,12 +94,12 @@ void RF24BLE::begin(){
 	address |= reverseBits(0x89);
 	address <<= BYTELEN;
 	address |= reverseBits(0x8E);
-	_radio.openWritingPipe(address, 4);
+	_radio.openWritingPipe(address);
 
 }
 void RF24BLE::recvBegin(uint8_t payloadSize, uint8_t channel, unsigned long pipeAddress){
 	begin();
-	_radio.setChannel(channel);
+	_radio.setChannel(chRf[channel]);
 	_radio.setPayloadSize(payloadSize);
 	_radio.openReadingPipe(1, 0xe76b7d9171);
 	_radio.startListening();
@@ -179,7 +179,7 @@ void RF24BLE::sendADV(uint8_t channel){
 	_radio.setChannel(chRf[channel]);
 	_packet[1] = _L-5;//subtract checksum bytes and the 2 bytes including the length byte and the first byte
 	blePacketEncode(_packet, _L, chLe[channel]);
-	_radio.startWrite(_packet, _L);
+	_radio.startWrite(_packet, _L,false);
 #if DEBUG
 	Serial.print("final length "); Serial.println(_L);
 #endif
@@ -211,8 +211,14 @@ uint8_t RF24BLE::recvPacket(uint8_t *input, uint8_t length,uint8_t channel ){
 	//reversing the bits of the complete packet
 	for (i = 0; i < length; i++){ input[i] = reverseBits(input[i]); }
 	//de-whiten the packet using the same polynomial
-	bleWhiten(input, length, bleWhitenStart(channel));
+	bleWhiten(input, length, bleWhitenStart(chLe[channel]));
 	//reversing bits of the crc 
 	for (i = 0; i < 3; i++, dataLen++){ input[dataLen] = reverseBits(input[dataLen]); }
+#if DEBUG
+	for (i = 0; i < length; i++){
+		Serial.print((char)input[i]);
+	}Serial.println();
+	// Packet length includes crc of 3 bytes
+#endif
 	return checkCRC(input, length);	
 }
