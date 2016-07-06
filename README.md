@@ -22,5 +22,4 @@ Choose and change the Chip enable (CE) and Chip select (CS) in the code correspo
 
 - open the app and click on scan and the advertised packet should be shown in the list in the app
 
-# NOTES
-- Thanks to Clive Hodge (email-id on request) for testing the Library for an Iphone.
+
