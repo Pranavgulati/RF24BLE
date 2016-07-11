@@ -15,22 +15,14 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="__vm\.nrf_BLE_beacon.vsarduino.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="printf.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="RF24BLE.h">
-      <Filter>Resource Files</Filter>
+    <ClInclude Include="__vm\.RF24BLE_beacon.vsarduino.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="RF24BLE.cpp">
-      <Filter>Resource Files</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="nrf_BLE_beacon.ino" />
+    <None Include="RF24BLE_beacon.ino" />
   </ItemGroup>
 </Project>

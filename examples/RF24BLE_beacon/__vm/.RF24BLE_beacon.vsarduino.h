@@ -84,8 +84,6 @@ extern "C" void __cxa_pure_virtual() {;}
 #define portOutputRegister(P)
 #define portInputRegister(P)
 #define portModeRegister(P)
-#include <..\nrf_BLE_beacon\nrf_BLE_beacon.ino>
-#include <..\nrf_BLE_beacon\RF24BLE.cpp>
-#include <..\nrf_BLE_beacon\RF24BLE.h>
-#include <..\nrf_BLE_beacon\printf.h>
+#include <..\RF24BLE_beacon\RF24BLE_beacon.ino>
+#include <..\RF24BLE_beacon\printf.h>
 #endif

@@ -13,7 +13,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{C5F80730-F44F-4478-BDAE-6634EFC2CA88}</ProjectGuid>
     <RootNamespace>nrf_BLE_beacon</RootNamespace>
-    <ProjectName>nrf_BLE_beacon</ProjectName>
+    <ProjectName>RF24BLE_beacon</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -45,8 +45,8 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\Program Files (x86)\Arduino\hardware\arduino\avr\cores\arduino;C:\Program Files (x86)\Arduino\hardware\arduino\avr\variants\standard;C:\Users\Pranav\documents\visual studio 2013\Projects\nrf_BLE_beacon\nrf_BLE_beacon;C:\Users\Pranav\Documents\Arduino\libraries\RF24;C:\Users\Pranav\Documents\Arduino\libraries\RF24\utility;C:\Program Files (x86)\Arduino\hardware\arduino\avr\libraries\SPI;C:\Program Files (x86)\Arduino\hardware\arduino\avr\libraries\SPI\utility;C:\Program Files (x86)\Arduino\libraries;C:\Program Files (x86)\Arduino\hardware\arduino\avr\libraries;C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\IDE\Extensions\gg1flwe2.1js\Micro Platforms\default\debuggers;C:\Users\Pranav\Documents\Arduino\libraries;C:\Program Files (x86)\Arduino\hardware\tools\avr/avr/include/;C:\Program Files (x86)\Arduino\hardware\tools\avr//avr/include/avr/;C:\Program Files (x86)\Arduino\hardware\tools\avr/lib\gcc\avr\4.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <ForcedIncludeFiles>C:\Users\Pranav\documents\visual studio 2013\Projects\nrf_BLE_beacon\nrf_BLE_beacon\__vm\.nrf_BLE_beacon.vsarduino.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <AdditionalIncludeDirectories>C:\Program Files (x86)\Arduino\hardware\arduino\avr\cores\arduino;C:\Program Files (x86)\Arduino\hardware\arduino\avr\variants\standard;C:\Users\Pranav\Documents\Arduino\libraries\RF24BLE\examples\RF24BLE_beacon;C:\Users\Pranav\Documents\Arduino\libraries\RF24;C:\Users\Pranav\Documents\Arduino\libraries\RF24\utility;C:\Users\Pranav\Documents\Arduino\libraries\RF24BLE;C:\Users\Pranav\Documents\Arduino\libraries\RF24BLE\utility;C:\Program Files (x86)\Arduino\hardware\arduino\avr\libraries\SPI;C:\Program Files (x86)\Arduino\hardware\arduino\avr\libraries\SPI\utility;C:\Program Files (x86)\Arduino\libraries;C:\Program Files (x86)\Arduino\hardware\arduino\avr\libraries;C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\IDE\Extensions\gg1flwe2.1js\Micro Platforms\default\debuggers;C:\Users\Pranav\Documents\Arduino\libraries;C:\Program Files (x86)\Arduino\hardware\tools\avr/avr/include/;C:\Program Files (x86)\Arduino\hardware\tools\avr//avr/include/avr/;C:\Program Files (x86)\Arduino\hardware\tools\avr/lib\gcc\avr\4.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ForcedIncludeFiles>C:\Users\Pranav\Documents\Arduino\libraries\RF24BLE\examples\RF24BLE_beacon\__vm\.RF24BLE_beacon.vsarduino.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
       <PreprocessorDefinitions>__AVR_ATmega328p__;__AVR_ATmega328P__;F_CPU=16000000L;ARDUINO=10606;ARDUINO_AVR_UNO;ARDUINO_ARCH_AVR;__cplusplus;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
@@ -69,15 +69,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="RF24BLE.h" />
     <ClInclude Include="printf.h" />
-    <ClInclude Include="__vm\.nrf_BLE_beacon.vsarduino.h" />
+    <ClInclude Include="__vm\.RF24BLE_beacon.vsarduino.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="RF24BLE.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="nrf_BLE_beacon.ino" />
+    <None Include="RF24BLE_beacon.ino" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

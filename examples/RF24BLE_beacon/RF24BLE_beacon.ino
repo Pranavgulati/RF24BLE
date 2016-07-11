@@ -35,7 +35,7 @@ void setup() {
 	BLE.begin();
 	//can be used to know if the radio is connected properly or not
 	//radio.printDetails();
-	
+
 }
 
 void loop() {
@@ -47,7 +47,7 @@ void loop() {
 		//may or may not set name 
 		//BLE.setName("nrfBle");
 		/*
-		*can use any data type to send data 
+		*can use any data type to send data
 		*it is typecasted internally
 		*this can also be used to send float or long etc. data type as under
 		*/
@@ -60,6 +60,6 @@ void loop() {
 		//uint8_t dataBytes[] = { "helloMO" };
 		BLE.setData(&dataBytes, sizeof(dataBytes));
 		BLE.sendADV(channel);
-		}
+	}
 	delay(500);    // Broadcasting interval
 }
