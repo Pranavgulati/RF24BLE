@@ -1,4 +1,4 @@
-# nrf_BLE_beacon
+# RF24BLE
 RF24BLE is the library that makes an nrf24L01+ chip (1$) into a BLE advertising beacon and can be used for LOW payload
 advertising like sensor data etc.
 
