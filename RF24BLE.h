@@ -16,7 +16,7 @@
 class RF24BLE{
 private:
 	uint8_t _packet[32]; //maximum size of payload handled by nrf24L01
-	uint8_t _L = 0;//length of packet filled 
+	uint8_t _length = 0; //length of packet filled
 	RF24& _radio;
 	uint8_t chRf[3];
 	uint8_t chLe[3];
