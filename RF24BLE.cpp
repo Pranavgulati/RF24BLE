@@ -112,18 +112,18 @@ void RF24BLE::setPhone(uint8_t phone_type){
 }
 void RF24BLE::setMAC(uint8_t m0, uint8_t m1, uint8_t m2, uint8_t m3, uint8_t m4, uint8_t m5){
 	//length of payload is entered in byte no.1
-	_L = 2;
-	_packet[_L++] = m0;
-	_packet[_L++] = m1;
-	_packet[_L++] = m2;
-	_packet[_L++] = m3;
-	_packet[_L++] = m4;
-	_packet[_L++] = m5;
-	//L should be 8 by now
+	_length = 2;
+	_packet[_length++] = m0;
+	_packet[_length++] = m1;
+	_packet[_length++] = m2;
+	_packet[_length++] = m3;
+	_packet[_length++] = m4;
+	_packet[_length++] = m5;
+	//length should be 8 by now
 	//flags (LE-only, limited discovery mode)
-	_packet[_L++] = 2;		//flag length
-	_packet[_L++] = 0x01; //data type 
-	_packet[_L++] = 0x05; //actual flag
+	_packet[_length++] = 2;    //flag length
+	_packet[_length++] = 0x01; //data type
+	_packet[_length++] = 0x05; //actual flag
 }
 
 void RF24BLE::setName(char* name){
@@ -137,10 +137,10 @@ void RF24BLE::setName(char* name){
 #endif
 	if (strlen(name) != 0){
 		//length of name includeing the terminating null character
-		_packet[_L++] = strlen(name) + 1;
-		_packet[_L++] = 0x08;//name type short name 
+		_packet[_length++] = strlen(name) + 1;
+		_packet[_length++] = 0x08;//name type short name
 		for (uint8_t i = 0; i < strlen(name); i++){
-			_packet[_L++] = name[i];
+			_packet[_length++] = name[i];
 		}
 	}
 	//else 
@@ -158,42 +158,42 @@ void RF24BLE::setData(const void* data,uint8_t dataLen){
 #if DEBUG
 	Serial.print("data "); Serial.println(dataLen);
 #endif
-	_packet[_L++] = dataLen +1;
-	_packet[_L++] = 0xFF;//data type 
+	_packet[_length++] = dataLen +1;
+	_packet[_length++] = 0xFF;//data type
 	for (uint8_t i = 0; i < dataLen; i++){
 		//Serial.print(*current);
-		_packet[_L++] = *(current);
+		_packet[_length++] = *(current);
 		current++;
 		
 	}
 	//CRC is appended to the data
 	//CRC starting val 0x555555 acc. to spec
-	_packet[_L++] = 0x55;	
-	_packet[_L++] = 0x55;
-	_packet[_L++] = 0x55;
+	_packet[_length++] = 0x55;
+	_packet[_length++] = 0x55;
+	_packet[_length++] = 0x55;
 }
 
 void RF24BLE::sendADV(uint8_t channel){
-	//Serial.print("length "); Serial.println(L);
-	if (_L > 32){ Serial.print("ADV FAIL! Packet too Long"); return; }
+	//Serial.print("length "); Serial.println(length);
+	if (_length > 32){ Serial.print("ADV FAIL! Packet too Long"); return; }
 	_radio.setChannel(chRf[channel]);
-	_packet[1] = _L-5;//subtract checksum bytes and the 2 bytes including the length byte and the first byte
-	blePacketEncode(_packet, _L, chLe[channel]);
-	_radio.startWrite(_packet, _L,false);
+	_packet[1] = _length-5;//subtract checksum bytes and the 2 bytes including the length byte and the first byte
+	blePacketEncode(_packet, _length, chLe[channel]);
+	_radio.startWrite(_packet, _length,false);
 #if DEBUG
-	Serial.print("final length "); Serial.println(_L);
+	Serial.print("final length "); Serial.println(_length);
 #endif
 }
 
 void RF24BLE::printPacket(){
-	for (uint8_t i = 0; i < _L; i++){
+	for (uint8_t i = 0; i < _length; i++){
 		Serial.print((char)_packet[i]);
 	}
 	Serial.println();
 
 }
 uint8_t RF24BLE::getPacketLengthCurr(){ 
-	return _L; }
+	return _length; }
 uint8_t RF24BLE::recvPacket(uint8_t *input, uint8_t length,uint8_t channel ){
 	unsigned long time = millis();
 	while (_radio.available()<=0 && (millis()-time)<RECV_TIMEOUT){delay(1);}
