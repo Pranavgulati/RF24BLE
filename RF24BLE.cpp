@@ -209,7 +209,7 @@ uint8_t RF24BLE::recvPacket(uint8_t *input, uint8_t length,uint8_t channel ){
 	if (_radio.available()>0){
 		_radio.read(input, length);
 	}
-	else { return 255; }
+	else { return RF24BLE_TIMEOUT; }
 	uint8_t i, dataLen = length - 3;
 #if DEBUG == 1
 	for (i = 0; i < length; i++){
