@@ -49,11 +49,17 @@ protected:
 public:
 	RF24BLE(RF24& radio);
 	void begin();
+	void transmitBegin();
 	void recvBegin(uint8_t payloadSize, uint8_t channel, uint64_t pipeAddress = 0xe76b7d9171);
 	void setMAC(uint8_t m0, uint8_t m1, uint8_t m2, uint8_t m3, uint8_t m4, uint8_t m5);
 	void setPhone(uint8_t phone_type);
 	void setName(const char* name);
 	void setData(const void* data,uint8_t dataLen);
+	/*
+		@brief
+		This function is a blocking function and it blocks for at least 4 ms
+	*/
+	void advertise();
 	void sendADV(uint8_t channel);
 	void printPacket();
 	uint8_t getPacketLengthCurr();//returns the current length of packet

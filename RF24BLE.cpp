@@ -73,6 +73,9 @@ void RF24BLE::blePacketEncode(uint8_t* packet, uint8_t len, uint8_t chan){
 		packet[i] = reverseBits(packet[i]); // the byte order of the packet should be reversed as well
 }
 void RF24BLE::begin(){
+	transmitBegin();
+}
+void RF24BLE::transmitBegin(){
 	_radio.disableCRC();
 	_radio.powerUp();
 	_radio.setAutoAck(false);
@@ -92,7 +95,6 @@ void RF24BLE::begin(){
 	address <<= BYTELEN;
 	address |= reverseBits(0x8E);
 	_radio.openWritingPipe(address);
-
 }
 void RF24BLE::recvBegin(uint8_t payloadSize, uint8_t channel, uint64_t pipeAddress){
 	begin();
@@ -170,8 +172,19 @@ void RF24BLE::setData(const void* data,uint8_t dataLen){
 	_packet[_length++] = 0x55;
 }
 
+void RF24BLE::advertise(){
+	transmitBegin();
+	  for (uint8_t channel = 0; channel < 3; channel++){  
+	  		sendADV(channel);
+	  		delay(1);
+	  }
+	  delay(1);
+}
+
 void RF24BLE::sendADV(uint8_t channel){
 	if (_length > 32){ Serial.print("ADV FAIL! Packet too Long"); return; }
+	if(channel>2 ||channel<0){Serial.print("Incorrect channel value, use RF24BLE.advertise()"); return;}
+	
 	_radio.setChannel(RF24BLE::chRf[channel]);
 	_packet[1] = _length-5;//subtract checksum bytes and the 2 bytes including the length byte and the first byte
 	blePacketEncode(_packet, _length, RF24BLE::chLe[channel]);
@@ -188,8 +201,8 @@ void RF24BLE::printPacket(){
 	Serial.println();
 
 }
-uint8_t RF24BLE::getPacketLengthCurr(){ 
-	return _length; }
+uint8_t RF24BLE::getPacketLengthCurr(){ return _length; }
+
 uint8_t RF24BLE::recvPacket(uint8_t *input, uint8_t length,uint8_t channel ){
 	unsigned long time = millis();
 	while (_radio.available()<=0 && (millis()-time)<RECV_TIMEOUT){delay(1);}
