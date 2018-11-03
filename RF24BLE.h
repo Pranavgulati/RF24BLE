@@ -1,25 +1,28 @@
-
-
-/**
-* about nrfBLE
-*
-*/
-
 #ifndef __RF24BLE_H__
 #define __RF24BLE_H__
 #include "RF24.h"
 #define DEBUG 0
 #define RECV_TIMEOUT 200
+
 #define RF24BLE_VALID 1
 #define RF24BLE_CORRUPT 0
 #define RF24BLE_TIMEOUT 255
+
+//using an enum might be good if we have more types
+#define PHONE_ANDROID   0x42
+#define PHONE_IPHONE    0x40
+
 class RF24BLE{
+
+
+	static const byte chRf[];
+	static const byte chLe[];
+	RF24& _radio;
 private:
 	uint8_t _packet[32]; //maximum size of payload handled by nrf24L01
 	uint8_t _length = 0; //length of packet filled
-	RF24& _radio;
-	uint8_t chRf[3];
-	uint8_t chLe[3];
+
+
 	static uint8_t  reverseBits(uint8_t input){
 		// reverse the bit order in a single byte
 		uint8_t temp = 0;
@@ -46,10 +49,10 @@ protected:
 public:
 	RF24BLE(RF24& radio);
 	void begin();
-	void recvBegin(uint8_t payloadSize, uint8_t channel, unsigned long pipeAddress = 0xe76b7d9171);
+	void recvBegin(uint8_t payloadSize, uint8_t channel, uint64_t pipeAddress = 0xe76b7d9171);
 	void setMAC(uint8_t m0, uint8_t m1, uint8_t m2, uint8_t m3, uint8_t m4, uint8_t m5);
 	void setPhone(uint8_t phone_type);
-	void setName(char* name);
+	void setName(const char* name);
 	void setData(const void* data,uint8_t dataLen);
 	void sendADV(uint8_t channel);
 	void printPacket();

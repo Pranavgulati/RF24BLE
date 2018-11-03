@@ -3,17 +3,14 @@
 #include "RF24BLE.h"
 #define BYTELEN 8
 
-RF24BLE::RF24BLE(RF24& radio) : _radio(radio){
 
-	chRf[0] = 2;
-	chRf[1] = 26;
-	chRf[2] = 80;
-	chLe[0] = 37;
-	chLe[1] = 38;
-	chLe[2] = 39;
-}
+const byte RF24BLE::chRf[] = {2,26,80} ;
+const byte RF24BLE::chLe[] = {37,38,39} ;
+
+RF24BLE::RF24BLE(RF24& radio) : _radio(radio){}
+
 void RF24BLE::BLEcrc(const uint8_t* data, uint8_t len, uint8_t* output){
-								//packet ,data length ,CRC output
+	//packet ,data length ,CRC output
 	// calculating the CRC based on a LFSR
 	uint8_t i, temp, d;
 
@@ -97,9 +94,9 @@ void RF24BLE::begin(){
 	_radio.openWritingPipe(address);
 
 }
-void RF24BLE::recvBegin(uint8_t payloadSize, uint8_t channel, unsigned long pipeAddress){
+void RF24BLE::recvBegin(uint8_t payloadSize, uint8_t channel, uint64_t pipeAddress){
 	begin();
-	_radio.setChannel(chRf[channel]);
+	_radio.setChannel(RF24BLE::chRf[channel]);
 	_radio.setPayloadSize(payloadSize);
 	_radio.openReadingPipe(1, 0xe76b7d9171);
 	_radio.startListening();
@@ -107,8 +104,8 @@ void RF24BLE::recvBegin(uint8_t payloadSize, uint8_t channel, unsigned long pipe
 }
 
 void RF24BLE::setPhone(uint8_t phone_type){
-	//byte no.0 PDu
-	_packet[0] = phone_type;
+	//byte no.0 PDU
+	_packet[0] = phone_type; 
 }
 void RF24BLE::setMAC(uint8_t m0, uint8_t m1, uint8_t m2, uint8_t m3, uint8_t m4, uint8_t m5){
 	//length of payload is entered in byte no.1
@@ -126,17 +123,17 @@ void RF24BLE::setMAC(uint8_t m0, uint8_t m1, uint8_t m2, uint8_t m3, uint8_t m4,
 	_packet[_length++] = 0x05; //actual flag
 }
 
-void RF24BLE::setName(char* name){
+void RF24BLE::setName(const char* name){
 	
 	//8,9,10 bytes are for flags 
 	//name field starts from 11th byte
-#if DEBUG
+#if DEBUG == 1
 	Serial.print(name);
 	Serial.print(" ");
 	Serial.println(strlen(name));
 #endif
 	if (strlen(name) != 0){
-		//length of name includeing the terminating null character
+		//length of name including the terminating null character
 		_packet[_length++] = strlen(name) + 1;
 		_packet[_length++] = 0x08;//name type short name
 		for (uint8_t i = 0; i < strlen(name); i++){
@@ -155,7 +152,7 @@ void RF24BLE::setData(const void* data,uint8_t dataLen){
 	const uint8_t* current = reinterpret_cast<const uint8_t*>(data);
 	//8,9,10 bytes are for flags 
 	//name field starts from 11th byte
-#if DEBUG
+#if DEBUG == 1 
 	Serial.print("data "); Serial.println(dataLen);
 #endif
 	_packet[_length++] = dataLen +1;
@@ -174,13 +171,12 @@ void RF24BLE::setData(const void* data,uint8_t dataLen){
 }
 
 void RF24BLE::sendADV(uint8_t channel){
-	//Serial.print("length "); Serial.println(length);
 	if (_length > 32){ Serial.print("ADV FAIL! Packet too Long"); return; }
-	_radio.setChannel(chRf[channel]);
+	_radio.setChannel(RF24BLE::chRf[channel]);
 	_packet[1] = _length-5;//subtract checksum bytes and the 2 bytes including the length byte and the first byte
-	blePacketEncode(_packet, _length, chLe[channel]);
+	blePacketEncode(_packet, _length, RF24BLE::chLe[channel]);
 	_radio.startWrite(_packet, _length,false);
-#if DEBUG
+#if DEBUG == 1
 	Serial.print("final length "); Serial.println(_length);
 #endif
 }
@@ -202,7 +198,7 @@ uint8_t RF24BLE::recvPacket(uint8_t *input, uint8_t length,uint8_t channel ){
 	}
 	else { return 255; }
 	uint8_t i, dataLen = length - 3;
-#if DEBUG
+#if DEBUG == 1
 	for (i = 0; i < length; i++){
 		Serial.print((char)input[i]);
 	}Serial.println();
@@ -211,10 +207,10 @@ uint8_t RF24BLE::recvPacket(uint8_t *input, uint8_t length,uint8_t channel ){
 	//reversing the bits of the complete packet
 	for (i = 0; i < length; i++){ input[i] = reverseBits(input[i]); }
 	//de-whiten the packet using the same polynomial
-	bleWhiten(input, length, bleWhitenStart(chLe[channel]));
+	bleWhiten(input, length, bleWhitenStart(RF24BLE::chLe[channel]));
 	//reversing bits of the crc 
 	for (i = 0; i < 3; i++, dataLen++){ input[dataLen] = reverseBits(input[dataLen]); }
-#if DEBUG
+#if DEBUG == 1
 	for (i = 0; i < length; i++){
 		Serial.print((char)input[i]);
 	}Serial.println();
