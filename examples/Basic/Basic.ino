@@ -4,7 +4,6 @@
 #define PIN_CE  9    // chip enable
 #define PIN_CS  10   // chip select (for SPI)
 RF24 radio(PIN_CE, PIN_CS);
-//special initialization such that each instance gets its radio object
 RF24BLE BLE(radio);
 
 // The MAC address of the beacon
@@ -29,7 +28,7 @@ void setup() {
 void loop() {  
   uint8_t dataBytes[] = { "hello" };
   BLE.setData(dataBytes, sizeof(dataBytes));
-  //RF24BLE.advertise() blocks for atleast 4 milliseconds
+  //RF24BLE.advertise() blocks for atleast 3 milliseconds
   BLE.advertise();
   delay(2);
   Serial.print("sent bytes: ");
