@@ -9,24 +9,24 @@ const byte RF24BLE::chLe[] = {37,38,39} ;
 
 RF24BLE::RF24BLE(RF24& radio) : _radio(radio){}
 
-void RF24BLE::BLEcrc(const uint8_t* data, uint8_t len, uint8_t* output){
-	//packet ,data length ,CRC output
+void RF24BLE::BLEcrc(const uint8_t* data, uint8_t dataLen, uint8_t* outputCRC){
 	// calculating the CRC based on a LFSR
-	uint8_t i, temp, d;
+	uint8_t i, temp, tempData;
 
-	while (len--){
-		d = *data++;
-		for (i = 0; i < 8; i++, d >>= 1){
-			temp = output[0] >> 7;
-			output[0] <<= 1;
-			if (output[1] & 0x80) output[0] |= 1;
-			output[1] <<= 1;
-			if (output[2] & 0x80) output[1] |= 1;
-			output[2] <<= 1;
+	while (dataLen--){
+		tempData = *data++;
+		for (i = 0; i < 8; i++, tempData >>= 1){
+			temp = outputCRC[0] >> 7;
+			
+			outputCRC[0] <<= 1;
+			if (outputCRC[1] & 0x80){ outputCRC[0] |= 1; }
+			outputCRC[1] <<= 1;
+			if (outputCRC[2] & 0x80){ outputCRC[1] |= 1; }
+			outputCRC[2] <<= 1;
 
-			if (temp != (d & 1)){
-				output[2] ^= 0x5B;
-				output[1] ^= 0x06;
+			if (temp != (tempData & 1)){
+				outputCRC[2] ^= 0x5B;
+				outputCRC[1] ^= 0x06;
 			}
 		}
 	}
@@ -40,11 +40,11 @@ uint8_t RF24BLE::checkCRC(uint8_t *input,uint8_t length){
 		//PACKET IS VALID
 		//Serial.println("VALID");
 		return 1;
-	}
-	else {
+	} else {
 		//PACKET is invalid
 		//Serial.println("CORRUPT");
-		return 0; }
+		return 0;
+	}
 }
 
 void RF24BLE::bleWhiten(uint8_t* data, uint8_t len, uint8_t whitenCoeff){
@@ -73,6 +73,7 @@ void RF24BLE::blePacketEncode(uint8_t* packet, uint8_t len, uint8_t chan){
 		packet[i] = reverseBits(packet[i]); // the byte order of the packet should be reversed as well
 }
 void RF24BLE::begin(){
+	_radio.begin();
 	transmitBegin();
 }
 void RF24BLE::transmitBegin(){
@@ -126,7 +127,7 @@ void RF24BLE::setMAC(uint8_t m0, uint8_t m1, uint8_t m2, uint8_t m3, uint8_t m4,
 }
 
 void RF24BLE::setName(const char* name){
-	
+	// name must be set only once 
 	//8,9,10 bytes are for flags 
 	//name field starts from 11th byte
 #if DEBUG == 1
@@ -146,39 +147,38 @@ void RF24BLE::setName(const char* name){
 		//no name to be sent 
 		//directly send manufacturere specific data 0xFF
 		//do nothing here
-	
 }
 
 void RF24BLE::setData(const void* data,uint8_t dataLen){
-
+	_dataFieldStartPoint = _dataFieldStartPoint==0?_length:_dataFieldStartPoint;
+	_length = _dataFieldStartPoint;
 	const uint8_t* current = reinterpret_cast<const uint8_t*>(data);
-	//8,9,10 bytes are for flags 
-	//name field starts from 11th byte
+
 #if DEBUG == 1 
 	Serial.print("data "); Serial.println(dataLen);
 #endif
 	_packet[_length++] = dataLen +1;
 	_packet[_length++] = 0xFF;//data type
 	for (uint8_t i = 0; i < dataLen; i++){
-		//Serial.print(*current);
 		_packet[_length++] = *(current);
 		current++;
-		
 	}
 	//CRC is appended to the data
 	//CRC starting val 0x555555 acc. to spec
 	_packet[_length++] = 0x55;
 	_packet[_length++] = 0x55;
 	_packet[_length++] = 0x55;
-}
 
+}
+/* 
+This function blocks the calling thread for atleast 4 milliseconds
+*/
 void RF24BLE::advertise(){
 	transmitBegin();
 	  for (uint8_t channel = 0; channel < 3; channel++){  
 	  		sendADV(channel);
-	  		delay(1);
+	  	for(int i = 0; i<512;i++){asm("nop");};
 	  }
-	  delay(1);
 }
 
 void RF24BLE::sendADV(uint8_t channel){
@@ -199,7 +199,6 @@ void RF24BLE::printPacket(){
 		Serial.print((char)_packet[i]);
 	}
 	Serial.println();
-
 }
 uint8_t RF24BLE::getPacketLengthCurr(){ return _length; }
 
@@ -212,10 +211,9 @@ uint8_t RF24BLE::recvPacket(uint8_t *input, uint8_t length,uint8_t channel ){
 	else { return RF24BLE_TIMEOUT; }
 	uint8_t i, dataLen = length - 3;
 #if DEBUG == 1
-	for (i = 0; i < length; i++){
-		Serial.print((char)input[i]);
-	}Serial.println();
 	// Packet length includes crc of 3 bytes
+	for (i = 0; i < length; i++){ Serial.print((char)input[i]); }
+	Serial.println();
 #endif
 	//reversing the bits of the complete packet
 	for (i = 0; i < length; i++){ input[i] = reverseBits(input[i]); }
@@ -224,10 +222,8 @@ uint8_t RF24BLE::recvPacket(uint8_t *input, uint8_t length,uint8_t channel ){
 	//reversing bits of the crc 
 	for (i = 0; i < 3; i++, dataLen++){ input[dataLen] = reverseBits(input[dataLen]); }
 #if DEBUG == 1
-	for (i = 0; i < length; i++){
-		Serial.print((char)input[i]);
-	}Serial.println();
-	// Packet length includes crc of 3 bytes
+	for (i = 0; i < length; i++){ Serial.print((char)input[i]); }
+	Serial.println();
 #endif
 	return checkCRC(input, length);	
 }

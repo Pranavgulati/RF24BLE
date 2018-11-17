@@ -6,7 +6,7 @@
 
 #define RF24BLE_VALID 1
 #define RF24BLE_CORRUPT 0
-#define RF24BLE_TIMEOUT 255
+#define RF24BLE_TIMEOUT 0xFF
 
 //using an enum might be good if we have more types
 #define PHONE_ANDROID   0x42
@@ -14,14 +14,14 @@
 
 class RF24BLE{
 
-
 	static const byte chRf[];
 	static const byte chLe[];
 	RF24& _radio;
-private:
-	uint8_t _packet[32]; //maximum size of payload handled by nrf24L01
-	uint8_t _length = 0; //length of packet filled
 
+private:
+	uint8_t _packet[32]; //maximum size of payload handled by nrf24L01 is 32
+	uint8_t _length = 0; //length of packet filled
+	uint8_t _dataFieldStartPoint = 0; 
 
 	static uint8_t  reverseBits(uint8_t input){
 		// reverse the bit order in a single byte
