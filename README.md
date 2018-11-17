@@ -4,8 +4,8 @@ advertising like sensor data etc.
 
 # Pre-Requisites
 - This library works on top of the RF24 library by TMRh20 (https://github.com/TMRh20/RF24)
-- Tested using Arduino v1.6.5(windows) and Arduino v1.0.5 (ubuntu)
-- Tested with "nrf Master Control Panel" app on google play store on android  LINK: https://play.google.com/store/apps/details?id=no.nordicsemi.android.mcp&hl=en
+- Tested using Arduino v1.8.5(windows) and Arduino v1.0.5 (ubuntu)
+- Tested with "nRF Connect for Mobile" app on google play store on android  LINK: https://play.google.com/store/apps/details?id=no.nordicsemi.android.mcp&hl=en
 - Tested on Iphone using iphone5S and LightBlue BLE app LINK: https://itunes.apple.com/in/app/lightblue-explorer-bluetooth/id557428110
 
 # Instructions
@@ -18,7 +18,7 @@ Choose and change the Chip enable (CE) and Chip select (CS) in the code correspo
 - open the arduino ide and choose an example from the file->examples menu and upload any example
 
 
-- Download and install the app "nrf Master control" app from the google play store on an android device.
+- Download and install the app "nRF Connect for Mobile" app from the google play store on an android device.
 
 - open the app and click on scan and the advertised packet should be shown in the list in the app
 
